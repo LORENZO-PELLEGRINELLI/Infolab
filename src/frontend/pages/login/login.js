@@ -228,6 +228,13 @@ export class Login extends LitElement {
           class="${this.emptyPasswordField ? "error" : ""}"
         ></il-password>
 
+              <il-button-icon
+                @click=${this.setVisibility}
+                content="${!this.pswVisibility ? "mdiEye" : "mdiEyeOff"}"
+              ></il-button-icon>
+            </div>
+          </label>
+        </div>
         <div>
           <button id="submit_btn" @click=${this.loginConfirm}>Connetti</button>
         </div>
