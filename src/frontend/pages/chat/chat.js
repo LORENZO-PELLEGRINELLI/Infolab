@@ -3,10 +3,13 @@ import { resolveMarkdown } from "lit-markdown";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 
+import { MarkdownService } from "../../services/markdown-services";
+
 import "../../components/button-icon";
 import "./search-chats.js";
-import "./chats-list.js";
+import "./conversation-list.js";
 import "./input-controls.js";
+import "./chat-header.js";
 
 export class Chat extends LitElement {
   static properties = {
@@ -76,33 +79,10 @@ export class Chat extends LitElement {
 
     .chat {
       position: relative;
-      padding: 100px 20px 70px 20px;
     }
 
-    .chatHeader {
-      position: absolute;
-      background: #083c72;
-      box-shadow: 0px 1px 5px black;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      min-height: 50px;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: white;
-    }
-
-    .chatHeader .settings {
-      order: 2;
-      display: flex;
-    }
-
-    .chatHeader .contact {
-      order: 1;
-      display: flex;
-      gap: 1em;
+    il-input-controls {
+      margin-top: auto;
     }
 
     .messageBox {
@@ -111,6 +91,14 @@ export class Chat extends LitElement {
       align-items: flex-end;
       flex-direction: column;
       gap: 30px;
+      width: 100%;
+      height: 480px;
+      overflow-y: auto;
+      padding: 30px 10px;
+    }
+
+    .messageBox::-webkit-scrollbar {
+      width: 0px;
     }
 
     li {
@@ -120,6 +108,7 @@ export class Chat extends LitElement {
     .messageBox > li {
       position: relative;
       min-width: 300px;
+      max-width: 500px;
       padding: 15px 8px;
       background: #f2f4f7;
       border-radius: 10px 10px 0 10px;
@@ -149,19 +138,6 @@ export class Chat extends LitElement {
       filter: blur(10px);
     }
 
-    @keyframes rotationAnim {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    #settingsIcon:hover {
-      animation: rotationAnim 2s infinite linear;
-    }
-
     :not(.dropdown)::-webkit-scrollbar {
       background-color: #0074bc;
       border-radius: 10px;
@@ -187,27 +163,19 @@ export class Chat extends LitElement {
         <section>
           <div class="sidebar">
             <il-search></il-search>
-            <il-chats-list></il-chats-list>
+            <il-conversation-list></il-conversation-list>
           </div>
 
           <div class="chat">
-            <div class="chatHeader">
-              <div class="settings">
-                <il-button-icon
-                  content="settings"
-                  id="settingsIcon"
-                ></il-button-icon>
-              </div>
-
-              <div class="contact">
-                <h2>ChatBox ${this.login.username}</h2>
-              </div>
-            </div>
-
+            <il-chat-header username=${this.login.username}></il-chat-header>
             <ul class="messageBox">
               ${this.messages.map(
                 (item, _) =>
-                  html` <li>${resolveMarkdown(this.parseMarkdown(item))}</li> `
+                  html`
+                    <li>
+                      ${resolveMarkdown(MarkdownService.parseMarkdown(item))}
+                    </li>
+                  `
               )}
             </ul>
 
@@ -218,16 +186,6 @@ export class Chat extends LitElement {
         </section>
       </main>
     `;
-  }
-
-  parseMarkdown(text) {
-    const md = require("markdown-it")({
-      html: false,
-      linkify: true,
-    });
-
-    const output = md.render(text);
-    return output;
   }
 
   createSocket() {

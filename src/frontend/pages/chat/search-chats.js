@@ -143,7 +143,7 @@ export class SearchChats extends LitElement {
             @input=${this.setFilter}
             @click=${this.setFilter}
           />
-          <il-button-icon content="search"></il-button-icon>
+          <il-button-icon content="mdiMagnify"></il-button-icon>
 
           <div class="dropdown">${this.showTips()}</div>
         </div>
@@ -153,7 +153,7 @@ export class SearchChats extends LitElement {
 
   async executePharmaciesCall() {
     return axios({
-      url: "http://localhost:3000/pharmacies",
+      url: "http://localhost:3000/users",
       method: "get",
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -169,7 +169,6 @@ export class SearchChats extends LitElement {
 
     this.executePharmaciesCall()
       .then((element) => {
-        console.log(element["data"]);
         element["data"].forEach((pharmacy) => {
           if (pharmacy.name.toLowerCase().indexOf(this.query) > -1)
             tmp.push(pharmacy);
